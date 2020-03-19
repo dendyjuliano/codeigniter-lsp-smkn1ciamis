@@ -216,6 +216,15 @@ class M_admin extends CI_Model
             return false;
         }
     }
+    public function import_exel_skema($inserdata)
+    {
+        $res = $this->db->insert_batch('tb_master_skema', $inserdata);
+        if ($res) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     // public function data_pelajaran($id_unit, $skema)
     // {

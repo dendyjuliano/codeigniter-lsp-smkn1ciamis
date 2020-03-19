@@ -1,16 +1,16 @@
-$("#jurusan").on("change", function() {
+$("#jurusan").on("change", function () {
 	var jurusan = this.value;
 	let a = "";
 	let b = "";
 
 	$.ajax({
-		url: "http://localhost:8000/admin/cari_jurusan",
+		url: "http://localhost/lsp-ciamis/admin/cari_jurusan",
 		type: "POST",
 		dataType: "html",
 		data: {
 			jurusan: jurusan
 		},
-		success: function(data) {
+		success: function (data) {
 			$("#tampil").html(data);
 
 			a = document.getElementById("nilai_k").value;
@@ -39,7 +39,7 @@ $("#jurusan").on("change", function() {
 let woilah_k = document.getElementById("woilah_k").value;
 let woilah_bk = document.getElementById("woilah_bk").value;
 
-$(document).ready(function() {
+$(document).ready(function () {
 	new Morris.Donut({
 		// ID of the element in which to draw the chart.
 		element: "pienilai",
