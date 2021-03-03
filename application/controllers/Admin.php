@@ -198,7 +198,7 @@ class Admin extends CI_Controller
                     $inserdata[$i]['nama_asesor'] = $value['B'];
                     $inserdata[$i]['id_skema'] = $value['C'];
                     $inserdata[$i]['asal_lsp'] = $value['D'];
-                    $inserdata[$i]['password'] = $value['E'];
+                    $inserdata[$i]['password'] =  password_hash($value['E'], PASSWORD_DEFAULT);
                     $inserdata[$i]['image'] = 'default.jpg';
                     $inserdata[$i]['role_id'] = '3';
                     $i++;
@@ -855,18 +855,21 @@ class Admin extends CI_Controller
         $data['title'] = "Entry Penilaian";
         $data['icon'] = base_url('assets/img/logo.png');
         $data['asesidata_id'] = $this->M_admin->data_asesi_row($id);
-        $data['head'] = $this->M_admin->data_head($nik);
-        $nomor_ujian = $data['head']['nomor_ujian'];
+
         $skema = $data['asesidata_id']['id_skema'];
 
         $hasil2 = $this->db->get_where('tb_master_unit', ['id_skema' => $skema])->row_array();
         $id_unit = $hasil2['id_unit'];
         $hasil3 = $this->db->get_where('tb_master_elemen', ['id_unit' => $id_unit])->result_array();
         $data['elemen'] = $this->db->get_where('tb_master_kuk', ['id_skema' => $skema])->result_array();
-        $data['elemen_id'] = $this->db->get_where('tb_detail_uji', ['nomor_ujian' => $nomor_ujian])->result_array();
 
-        // $data['elemen'] = $this->M_admin->data_pelajaran($id_unit, $skema);
-        if ($data['head']['nik'] == $data['asesidata_id']['nik']) {
+        $cek = $this->db->get_where('tb_head_uji', ['nik' => $nik])->num_rows();
+
+        if ($cek > 0) {
+            $data['head'] = $this->M_admin->data_head($nik);
+            $nomor_ujian = $data['head']['nomor_ujian'];
+            $data['elemen_id'] = $this->db->get_where('tb_detail_uji', ['nomor_ujian' => $nomor_ujian])->result_array();
+
             $data['kode'] = $this->M_admin->uniqe_code();
             $this->load->view('admin/templates/header', $data);
             $this->load->view('admin/templates/sidebar');
@@ -932,7 +935,9 @@ class Admin extends CI_Controller
         echo count($data3);
 
         $berhasil = $this->db->insert_batch('tb_detail_uji', $data3);
+
         if ($berhasil) {
+            $this->M_admin->updateRataRata($nik);
             $this->session->set_flashdata('flash', 'Tambah');
             redirect('admin/entry');
         } elseif (count($eror) > 0) {
@@ -952,6 +957,7 @@ class Admin extends CI_Controller
         $judul_kuk = $this->input->post('judul_kuk');
         $no_ujian = $this->input->post('no_ujian');
         $id = $this->input->post('id');
+        $nik = $this->input->post('nik');
 
         $eror = array();
         $data3 = array();
@@ -961,6 +967,8 @@ class Admin extends CI_Controller
 
             if ($key > 79) {
                 $kompeten[$index] = "K";
+            } else if ($key < 79) {
+                $kompeten[$index] = "BK";
             } else {
                 $kompeten[$index] = "BK";
             }
@@ -982,12 +990,14 @@ class Admin extends CI_Controller
 
         $berhasil = $this->db->update_batch('tb_detail_uji', $data3, 'id');
         if ($berhasil) {
+            $this->M_admin->updateRataRata($nik);
             $this->session->set_flashdata('flash', 'Edit');
             redirect('admin/entry');
         } elseif (count($eror) > 0) {
             echo "Data tidak lengkap";
         } else {
-            echo "Gagal Update Data";
+            $this->session->set_flashdata('flash2', 'Gagal');
+            redirect('admin/entry');
         }
     }
     //End Entry
@@ -1069,12 +1079,11 @@ class Admin extends CI_Controller
         $data['asesidata_id'] = $this->M_admin->data_asesi_row($id);
         $data['icon'] = base_url('assets/img/logo.png');
 
-        $query = "SELECT tb_head_uji.nomor_ujian, tb_head_uji.nik, tb_master_asesi.nama_asesi,tb_master_asesi.id, tb_master_asesor.id_skema, tb_master_skema.judul_skema, tb_detail_uji.id_unit, tb_master_unit.judul_unit, Sum(tb_detail_uji.nilai) AS nilai_kumulatif, Count(tb_detail_uji.id_kuk) AS jml_kuk, Sum(tb_detail_uji.nilai)/Count(tb_detail_uji.id_kuk) AS rata2, If(Sum(tb_detail_uji.nilai)/Count(tb_detail_uji.id_kuk)<80,'BK','K') AS keterangan FROM (tb_master_skema INNER JOIN ((tb_master_elemen INNER JOIN tb_master_kuk ON (tb_master_elemen.id_elemen = tb_master_kuk.id_elemen) AND (tb_master_elemen.id_unit = tb_master_kuk.id_unit) AND (tb_master_elemen.id_skema = tb_master_kuk.id_skema)) INNER JOIN (tb_master_asesor INNER JOIN (tb_master_asesi INNER JOIN (tb_head_uji INNER JOIN tb_detail_uji ON tb_head_uji.nomor_ujian = tb_detail_uji.nomor_ujian) ON tb_master_asesi.nik = tb_head_uji.nik) ON tb_master_asesor.no_reg = tb_master_asesi.no_reg) ON (tb_master_kuk.id_kuk = tb_detail_uji.id_kuk) AND (tb_master_kuk.id_elemen = tb_detail_uji.id_elemen) AND (tb_master_kuk.id_unit = tb_detail_uji.id_unit) AND (tb_master_kuk.id_skema = tb_detail_uji.id_skema)) ON tb_master_skema.id_skema = tb_master_asesor.id_skema) INNER JOIN tb_master_unit ON (tb_master_unit.id_unit = tb_master_elemen.id_unit) AND (tb_master_unit.id_skema = tb_master_elemen.id_skema) AND (tb_master_skema.id_skema = tb_master_unit.id_skema) WHERE tb_master_asesi.id = $id GROUP BY tb_head_uji.nomor_ujian, tb_head_uji.nik, tb_master_asesi.nama_asesi, tb_master_asesor.id_skema, tb_master_skema.judul_skema, tb_detail_uji.id_unit, tb_master_unit.judul_unit;";
+        $query = "SELECT tb_head_uji.nomor_ujian, tb_head_uji.nik, tb_master_asesi.nama_asesi,tb_master_asesi.id, tb_master_asesor.id_skema, tb_master_skema.judul_skema, tb_detail_uji.id_unit, tb_master_unit.judul_unit, Sum(tb_detail_uji.nilai) AS nilai_kumulatif, Count(tb_detail_uji.id_kuk) AS jml_kuk, Sum(tb_detail_uji.nilai)/Count(tb_detail_uji.id_kuk) AS rata2, If(Sum(tb_detail_uji.nilai)/Count(tb_detail_uji.id_kuk)<80,'BK','K') AS keterangan FROM (tb_master_skema INNER JOIN ((tb_master_elemen INNER JOIN tb_master_kuk ON (tb_master_elemen.id_elemen = tb_master_kuk.id_elemen) AND (tb_master_elemen.id_unit = tb_master_kuk.id_unit) AND (tb_master_elemen.id_skema = tb_master_kuk.id_skema)) INNER JOIN (tb_master_asesor INNER JOIN (tb_master_asesi INNER JOIN (tb_head_uji INNER JOIN tb_detail_uji ON tb_head_uji.nomor_ujian = tb_detail_uji.nomor_ujian) ON tb_master_asesi.nik = tb_head_uji.nik) ON tb_master_asesor.no_reg = tb_master_asesi.no_reg) ON (tb_master_kuk.id_kuk = tb_detail_uji.id_kuk) AND (tb_master_kuk.id_elemen = tb_detail_uji.id_elemen) AND (tb_master_kuk.id_unit = tb_detail_uji.id_unit) AND (tb_master_kuk.id_skema = tb_detail_uji.id_skema)) ON tb_master_skema.id_skema = tb_master_asesor.id_skema) INNER JOIN tb_master_unit ON (tb_master_unit.id_unit = tb_master_elemen.id_unit) AND (tb_master_unit.id_skema = tb_master_elemen.id_skema) AND (tb_master_skema.id_skema = tb_master_unit.id_skema) WHERE tb_master_asesi.id = '$id' GROUP BY tb_head_uji.nomor_ujian, tb_head_uji.nik, tb_master_asesi.nama_asesi, tb_master_asesor.id_skema, tb_master_skema.judul_skema, tb_detail_uji.id_unit, tb_master_unit.judul_unit;";
         $data['hasil2'] = $this->db->query($query)->result_array();
 
         $hitung =  count($data['hasil2']);
         if ($hitung > 0) {
-            $this->M_admin->updateRataRata($nik);
             $this->load->view('admin/templates/header', $data);
             $this->load->view('admin/templates/sidebar');
             $this->load->view('admin/templates/navbar');

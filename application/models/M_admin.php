@@ -52,7 +52,7 @@ class M_admin extends CI_Model
                 }
             }
 
-            $this->db->set('password', $password);
+            $this->db->set('password', password_hash($password, PASSWORD_DEFAULT));
             $this->db->where('id', $id);
             $this->db->update('tb_master_asesor');
         }
@@ -225,15 +225,6 @@ class M_admin extends CI_Model
             return false;
         }
     }
-
-    // public function data_pelajaran($id_unit, $skema)
-    // {
-    //     $this->db->select('tb_master_elemen.*,tb_master_kuk.*');
-    //     $this->db->from('tb_master_elemen');
-    //     $this->db->join('tb_master_kuk', 'tb_master_kuk.id_unit = tb_master_elemen.id_unit');
-    //     $this->db->where(['tb_master_kuk.id_unit' => $id_unit, 'tb_master_kuk.id_skema' => $skema]);
-    //     return $this->db->get()->result_array();
-    // }
 
     public function data_head($nik)
     {

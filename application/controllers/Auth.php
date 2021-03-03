@@ -30,7 +30,7 @@ class Auth extends CI_Controller
         $user = $this->db->get_where('tb_master_asesor', ['no_reg' => $noreg])->row_array();
 
         if ($user) {
-            if ($password == $user['password']) {
+            if (password_verify($password, $user['password'])) {
 
                 $data = [
                     'id' => $user['id'],
@@ -70,6 +70,7 @@ class Auth extends CI_Controller
         $this->session->unset_userdata('password');
         $this->session->unset_userdata('image');
         $this->session->unset_userdata('role_id');
+        $this->session->unset_userdata('status');
 
         $this->session->set_flashdata('message', '<div class="alert alert-success" role="alert">
         Berhasil Keluar</div>');

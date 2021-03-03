@@ -56,13 +56,6 @@
 <!-- Sweet Alert -->
 <?php $this->load->view('admin/templates/alert') ?>
 
-<?php
-$js = isset($page_js) ? $page_js : 'index.js';
-?>
-
-<script src="<?= base_url('assets/js/') . $js ?>"></script>
-
-
 <script>
     $('.custom-file-input').on('change', function() {
         let fileName = $(this).val().split('\\').pop();
@@ -191,170 +184,71 @@ $js = isset($page_js) ? $page_js : 'index.js';
 </script>
 
 <script>
-    $('#jurusan').on('change', function() {
-        var jurusan = (this.value);
+    $("#jurusan").on("change", function() {
+        var jurusan = this.value;
+        let a = "";
+        let b = "";
+
         $.ajax({
             url: "<?= base_url('admin/cari_jurusan') ?>",
             type: "POST",
             dataType: "html",
             data: {
-                'jurusan': jurusan
+                jurusan: jurusan
             },
             success: function(data) {
-                $("#tampil").html(data)
-                var nilaik = document.getElementById('nilai_k').value;
-                var nilaibk = document.getElementById('nilai_bk').value;
-                tampilBar(nilaik, nilaibk)
-            },
-        })
-    })
-</script>
+                $("#tampil").html(data);
 
-<script>
-    var area = document.getElementById("areanilai");
-    var myBarChart = new Chart(area, {
-        type: 'bar',
-        data: {
-            labels: ["K", "BK"],
-            datasets: [{
-                label: "Hidden",
-                backgroundColor: ['#4e73df', '#EA2027'],
-                hoverBackgroundColor: ['#2e59d9', '#EA2027'],
-                hoverBorderColor: "rgba(234, 236, 244, 1)",
-                data: [
-                    <?=
-                        $nilai_a
-                    ?>,
-                    <?=
-                        $nilai_b
-                    ?>
-                ],
-            }, ],
-        },
-        options: {
-            maintainAspectRatio: false,
-            layout: {
-                padding: {
-                    top: 25,
-                    bottom: 0
-                }
-            },
-            scales: {
-                xAxes: [{
-                    time: {
-                        unit: 'month'
-                    },
-                    gridLines: {
-                        display: false,
-                        drawBorder: false
-                    },
-                    ticks: {
-                        maxTicksLimit: 6
-                    },
-                    maxBarThickness: 80,
-                }],
-                yAxes: [{
-                    ticks: {
-                        min: 0,
-                        padding: 10,
-
-                    },
-                    gridLines: {
-                        color: "rgb(234, 236, 244)",
-                        zeroLineColor: "rgb(234, 236, 244)",
-                        drawBorder: false,
-                        borderDash: [2],
-                        zeroLineBorderDash: [2]
-                    }
-                }],
-            },
-            tooltips: {
-                titleFontColor: '#6e707e',
-                titleFontSize: 14,
-                backgroundColor: "rgb(255,255,255)",
-                bodyFontColor: "#858796",
-                borderColor: '#dddfeb',
-                borderWidth: 1,
-                xPadding: 15,
-                yPadding: 15,
-                displayColors: false,
-                caretPadding: 10,
-            },
-        }
-    });
-</script>
-
-<script>
-    function tampilBar(nilaik, nilaibk) {
-        var area = document.getElementById("areanilai");
-        var myBarChart = new Chart(area, {
-            type: 'bar',
-            data: {
-                labels: ["K", "BK"],
-                datasets: [{
-                    label: "Hidden",
-                    backgroundColor: ['#4e73df', '#EA2027'],
-                    hoverBackgroundColor: ['#2e59d9', '#17a673'],
-                    hoverBorderColor: "rgba(234, 236, 244, 1)",
-                    data: [
-                        nilaik, nilaibk
-                    ],
-                }, ],
-            },
-            options: {
-                maintainAspectRatio: false,
-                layout: {
-                    padding: {
-                        top: 25,
-                        bottom: 0
-                    }
-                },
-                scales: {
-                    xAxes: [{
-                        time: {
-                            unit: 'month'
+                a = document.getElementById("nilai_k").value;
+                b = document.getElementById("nilai_bk").value;
+                new Morris.Bar({
+                    // ID of the element in which to draw the chart.
+                    element: "myfirstchart",
+                    // Chart data records -- each entry in this array corresponds to a point on
+                    // the chart.
+                    data: [{
+                            nilai: "BK",
+                            value: b
                         },
-                        gridLines: {
-                            display: false,
-                            drawBorder: false
-                        },
-                        ticks: {
-                            maxTicksLimit: 6
-                        },
-                        maxBarThickness: 80,
-                    }],
-                    yAxes: [{
-                        ticks: {
-                            min: 0,
-                            padding: 10,
-
-                        },
-                        gridLines: {
-                            color: "rgb(234, 236, 244)",
-                            zeroLineColor: "rgb(234, 236, 244)",
-                            drawBorder: false,
-                            borderDash: [2],
-                            zeroLineBorderDash: [2]
+                        {
+                            nilai: "K",
+                            value: a
                         }
-                    }],
-                },
-                tooltips: {
-                    titleFontColor: '#6e707e',
-                    titleFontSize: 14,
-                    backgroundColor: "rgb(255,255,255)",
-                    bodyFontColor: "#858796",
-                    borderColor: '#dddfeb',
-                    borderWidth: 1,
-                    xPadding: 15,
-                    yPadding: 15,
-                    displayColors: false,
-                    caretPadding: 10,
-                },
+                    ],
+                    // The name of the data record attribute that contains x-values.
+                    xkey: "nilai",
+                    // A list of names of data record attributes that contain y-values.
+                    ykeys: ["value"],
+                    // Labels for the ykeys -- will be displayed when you hover over the
+                    // chart.
+                    labels: ["Value"]
+                });
             }
         });
-    }
+    });
 
-    $('#tampil').hide();
+    let woilah_k = document.getElementById("woilah_k").value;
+    let woilah_bk = document.getElementById("woilah_bk").value;
+
+    $(document).ready(function() {
+        new Morris.Donut({
+            // ID of the element in which to draw the chart.
+            element: "pienilai",
+            // Chart data records -- each entry in this array corresponds to a point on
+            // the chart.
+            data: [{
+                    label: "BK",
+                    value: woilah_bk
+                },
+                {
+                    label: "K",
+                    value: woilah_k
+                }
+            ]
+            // The name of the data record attribute that contains x-values.
+            // chart.
+        });
+    });
 </script>
 
 </body>

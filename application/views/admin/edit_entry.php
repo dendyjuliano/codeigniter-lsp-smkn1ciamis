@@ -35,16 +35,6 @@
         </div>
     </div>
 
-    <?php
-    $asal   = $asesidata_id['asal_lsp'];
-    $hasil = $this->db->get_where('tb_master_skema', ['id_skema' => $asal])->result_array();
-    $hasil2 = $this->db->get_where('tb_master_unit', ['id_skema' => $asal])->row_array();
-    $id_skema = $hasil2['id_skema'];
-    // $hasil3 = $this->db->get_where('tb_master_elemen', ['id_skema' => $id_skema])->result_array();
-    $jumlah = $this->db->get_where('tb_master_elemen', ['id_skema' => $id_skema])->num_rows();
-    $keahlian = $this->db->get('tb_keahlian')->result_array();
-    ?>
-
     <div class="card shadow mb-4">
         <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
             <h6 class="m-0 font-weight-bold text-primary">Penilaian Asesi</h6>
@@ -80,6 +70,7 @@
                                     </td>
                                     <input type="hidden" class="form-control" name="id[]" id="id" value="<?= $row['id'] ?>">
                                     <input type="hidden" class="form-control" name="no_ujian[]" id="no_ujian" value="<?= $row['nomor_ujian'] ?>">
+                                    <input type="hidden" class="form-control" name="nik" id="nik" value="<?= $asesidata_id['nik'] ?>">
                                     <input type="hidden" class="form-control" name="id_skema[]" id="id_skema" value="<?= $row['id_skema'] ?>">
                                     <input type="hidden" class="form-control" name="id_unit[]" id="id_unit" value="<?= $row['id_unit'] ?>">
                                     <input type="hidden" class="form-control" name="id_elemen[]" id="id_elemen" value="<?= $row['id_elemen'] ?>">

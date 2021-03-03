@@ -4,10 +4,12 @@
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800"><?= $title ?></h1>
-        <!-- <div class="buton ml-auto">
-            <a id="exel" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm"><i class="fas fa-file-excel  text-white-50"></i> Export Excel</a>
-            <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm"><i class="fas fa-file-pdf  text-white-50"></i> Export PDF</a>
-        </div> -->
+        <?php if ($this->session->userdata('role_id') == 1) : ?>
+            <div class="buton ml-auto">
+                <a id="exel" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm text-white"><i class="fas fa-file-excel  text-white-50"></i> Export Excel</a>
+                <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm"><i class="fas fa-file-pdf  text-white-50"></i> Export PDF</a>
+            </div>
+        <?php endif; ?>
     </div>
     <div class="flash-data" data-flashdata="<?= $this->session->flashdata('flash'); ?>"></div>
     <!-- DataTales Example -->
@@ -49,7 +51,7 @@
         <div class="card shadow mb-4">
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table data text-center" width="100%" cellspacing="0">
+                    <table class="table data" width="100%" cellspacing="0">
                         <thead>
                             <tr>
                                 <th>No</th>
@@ -148,20 +150,6 @@
         $('#skema').on('change', function() {
             var skema = $(this).val();
             table.ajax.reload();
-            // $.ajax({
-            //     url: "<?php echo base_url('admin/rekap'); ?>",
-            //     type: "POST",
-            //     data: {
-            //         'skema': skema
-            //     },
-            //     dataType: "html",
-            //     success: function(data) {
-            //         $('#b').html(data);
-            //     },
-            //     error: function() {
-
-            //     }
-            // });
 
         });
 
@@ -169,7 +157,7 @@
             var url = "<?= base_url('admin/export_excel_rekap') ?>";
             var skema = $('#skema').val();
             if (skema != null) {
-                url += "skema=" + skema;
+                url += "?skema=" + skema;
             }
 
             console.log(url);

@@ -1,11 +1,20 @@
 //sweat alert
 const flashdata = $('.flash-data').data('flashdata');
+const flashdata2 = $('.flash-data2').data('flashdata2');
 
 if (flashdata) {
     Swal.fire({
         icon: 'success',
         title: 'Berhasil',
         text: 'Data telah di ' + flashdata
+    });
+}
+
+if (flashdata2) {
+    Swal.fire({
+        icon: 'error',
+        title: 'Terjadi Kesalahan',
+        text: 'Silahkan dicoba kembali'
     });
 }
 

@@ -6,6 +6,7 @@
         <h1 class="h3 mb-0 text-gray-800"><?= $title ?></h1>
     </div>
     <div class="flash-data" data-flashdata="<?= $this->session->flashdata('flash'); ?>"></div>
+    <div class="flash-data2" data-flashdata2="<?= $this->session->flashdata('flash2'); ?>"></div>
     <?php if ($this->session->userdata('role_id') == 1) : ?>
         <!-- DataTales Example -->
         <div class="card shadow mb-4">
@@ -48,8 +49,8 @@
         <div class="card shadow mb-4">
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table data text-center" width="100%" cellspacing="0">
-                        <thead class="bg-primary text-white">
+                    <table class="table data" width="100%" cellspacing="0">
+                        <thead>
                             <tr>
                                 <th>No</th>
                                 <th>NIK</th>
